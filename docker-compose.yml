@@ -1,0 +1,39 @@
+networks:
+  local-network:
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    networks:
+      - local-network
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=task-manager
+    ports:
+      - "5432:5432"
+
+  task-manager:
+    container_name: task-manager
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - local-network
+    environment:
+      - SECRET_KEY= ${SECRET_KEY}
+      - DB_URL=postgres
+    env_file:
+      - .env
+    develop:
+      watch:
+        - path: .
+          action: rebuild
+          ignore:
+            - .idea
+            - .git
+            - .gitignore
+
+    
